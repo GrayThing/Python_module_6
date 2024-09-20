@@ -21,6 +21,8 @@ class Figure():
     def __is_valid_color(self, r, g, b):
         if r > 255 or r < 0 or g > 255 or g < 0 or b > 255 or b < 0:
             return False
+        if not isinstance(r, int) and not isinstance(g, int) and not isinstance(b, int):
+            return False
         return True
 
     def set_color(self, r, g, b):
@@ -48,6 +50,10 @@ class Figure():
             print(f'Ошибка. Допустимое количество сторон {self.sides_count},'
                   f' внесено {len(new_sides)}')
             return
+        for side in new_sides:
+            if not isinstance(side, int):
+                print(f'Сторона должна быть экземпляром класса int, получено {type(side).__name__}')
+                return
         self.__sides = [*new_sides]
 
 
@@ -66,8 +72,9 @@ class Triangle(Figure):
     sides_count = 3
 
     def get_square(self):
-        p = 0.5 * (self.__sides[0] + self.__sides[1] + self.__sides[2])
-        return math.sqrt(p * (p - self.__sides[0]) * (p - self.__sides[1]) * (p - self.__sides[2]))
+        sides = self.get_sides()
+        p = 0.5 * (sides[0] + sides[1] + sides[2])
+        return math.sqrt(p * (p - sides[0]) * (p - sides[1]) * (p - sides[2]))
 
 
 class Cube(Figure):
@@ -75,31 +82,14 @@ class Cube(Figure):
 
     def __init__(self, colors: tuple, *sides_qty: int, filled=False):
         super().__init__(colors, *sides_qty, filled=filled)
-        self.set_sides(*[sides_qty[0] for _ in range(0, self.sides_count)])
+        if len(sides_qty) == 1:
+            self.set_sides(*[sides_qty[0] for _ in range(0, self.sides_count)])
+        if len(sides_qty) > 1:
+            self.set_sides([1 for _ in range(0, self.sides_count)])
 
     def get_volume(self):
         return self.get_sides()[0] ** 3
 
 
-circle1 = Circle((200, 200, 100), 10) # (Цвет, стороны)
-cube1 = Cube((222, 35, 130), 6)
-
-# Проверка на изменение цветов:
-circle1.set_color(55, 66, 77) # Изменится
-print(circle1.get_color())
-cube1.set_color(300, 70, 15) # Не изменится
-print(cube1.get_color())
-
-# Проверка на изменение сторон:
-cube1.set_sides(5, 3, 12, 4, 5) # Не изменится
-print(cube1.get_sides())
-circle1.set_sides(15) # Изменится
-print(circle1.get_sides())
-
-# Проверка периметра (круга), это и есть длина:
-print(len(circle1))
-
-# Проверка объёма (куба):
-print(cube1.get_volume())
 
 
